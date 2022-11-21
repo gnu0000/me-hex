@@ -1,15 +1,11 @@
 "use strict";
 
-// morph.js
+// hex.js
 //
-// This loads an image into a canvas and lets you drag pixels around using 
-// the mouse (click-drag). 
-// This also demonstrates:
-//    loading an initial image
-//    loading an image from a file input
-//    a simple undo/redo design pattern
+// Generate random image of hexagonal tilings
+// This is also an example of saving a canvas as a png
 //
-// todo: implement alternate drag algorithms
+// todo: create some good tile generators
 //
 // Craig Fitzgerald 2022
 
@@ -23,32 +19,27 @@ class HexTiler {
       this.dx  = this.radius * 2;
       this.dy  = this.radius * 2 * 0.86602;
 
-      $(window).resize(()=>this.Resize());
-      $("#regenerate").on("click", ()=>this.Go());
+      $(window       ).on("resize",()=>this.Resize());
+      $("#regenerate").on("click", ()=>this.Regen());
       $("#download"  ).on("click", ()=>this.Download());
+      this.InitStyles();
+      this.InitElements();
       this.Resize();
-      //this.Go();
    }
-
 
    Resize() {
-      var x = $(window).width() ;
-      var y = $(window).height();
-      $('body').width (x);    // needed?
-      $('body').height(y);    // needed?
+      let x = $(window).width();
+      let y = $(window).height();
       this.$canvas.width (x);
       this.$canvas.height(y);
-      this.canvas.width  = x; // needed?
-      this.canvas.height = y; // needed?
-
+      this.canvas.width  = x;
+      this.canvas.height = y;
       this.xGrid = Math.floor(x / this.dx) + 1;
       this.yGrid = Math.floor(y / this.dy) + 1;
-
-      this.Go();
+      this.Draw();
    }
 
-
-   Go() {
+   Regen() {
       this.InitStyles();
       this.InitElements();
       this.Draw();
@@ -56,7 +47,6 @@ class HexTiler {
 
    InitStyles() {
       let h = Math.random() * 360;
-
       this.styles = [
          this.HSL (h,     "35%", "55%"),
          this.HSL ((h+180) % 360, "95%", "35%"),
@@ -79,7 +69,7 @@ class HexTiler {
          {s: 6, f: () => this.Rect  (r * 0.8, -r * 0.4, 10, r * 0.8, 3)},
          {s: 6, f: () => this.Circle(r * 0.8, 0, 10, 5, 0, 3)},
       ];
-
+      // todo... flesh out some good generators
       this.elements.push({s: 6, f: () => this.Rect (...r1, 2)});
       this.elements.push({s: 6, f: () => this.Rect (...r2, 3)});
       this.elements.push({s: 6, f: () => this.Rect (...r3, 1)});
@@ -88,10 +78,6 @@ class HexTiler {
    Draw() {
       this.DrawBackground();
 
-      this.ctx.fillStyle = "green";
-
-//      for (let y = 0; y<6; y++) {
-//         for (let x = 0; x<6; x++) {
       // account for elements possibly exceeding the boundry of a hex
       for (let y = -1; y <= this.yGrid; y++) {
          for (let x = -1; x <= this.xGrid; x++) {
@@ -106,7 +92,6 @@ class HexTiler {
       this.ctx.fillStyle = this.styles[0];
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
    }
-
 
    DrawHex(c) {
       this.ctx.save();
@@ -132,7 +117,6 @@ class HexTiler {
       this.ctx.restore();
    }
 
-
    Circle (x, y, r, w, ss, fs) {
       this.ctx.beginPath()
       this.ctx.arc(x,y,r,0,Math.PI * 2);
@@ -143,12 +127,10 @@ class HexTiler {
       if (fs) this.ctx.fill();
    }
 
-
    Rect (x, y, w, h, c) {
       this.ctx.fillStyle = this.styles[c];
       this.ctx.fillRect(x, y, w, h);
    }
-
 
    Rand(count, size, offset) {
       let ret = [];
