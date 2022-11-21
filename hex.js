@@ -18,13 +18,35 @@ class HexTiler {
    constructor() {
       this.$canvas = $("#canvas");
       this.canvas  = this.$canvas.get(0);
-      this.ctx = this.canvas.getContext("2d");
-      this.r   = 100;
-      this.dx  = this.r * 2;
-      this.dy  = this.r * 2 * 0.86602;
+      this.ctx     = this.canvas.getContext("2d");
+      this.radius  = 100;
+      this.dx  = this.radius * 2;
+      this.dy  = this.radius * 2 * 0.86602;
+
+      $(window).resize(()=>this.Resize());
+      $("#regenerate").on("click", ()=>this.Go());
+      $("#download"  ).on("click", ()=>this.Download());
+      this.Resize();
+      //this.Go();
+   }
+
+
+   Resize() {
+      var x = $(window).width() ;
+      var y = $(window).height();
+      $('body').width (x);    // needed?
+      $('body').height(y);    // needed?
+      this.$canvas.width (x);
+      this.$canvas.height(y);
+      this.canvas.width  = x; // needed?
+      this.canvas.height = y; // needed?
+
+      this.xGrid = Math.floor(x / this.dx) + 1;
+      this.yGrid = Math.floor(y / this.dy) + 1;
 
       this.Go();
    }
+
 
    Go() {
       this.InitStyles();
@@ -44,17 +66,18 @@ class HexTiler {
    }
 
    InitElements() {
-      let r0 = this.Rand(4, this.r, 0);
-      let r1  = this.Rand(4, this.r * 1.5, - this.r/2);
-      let r2 = this.Rand(4, this.r * 1.25, - this.r/2);
-      let r3 = this.Rand(4, this.r, - this.r/2);
+      let r  = this.radius;
+      let r0 = this.Rand(4, r, 0);
+      let r1 = this.Rand(4, r * 1.5,  - r/2);
+      let r2 = this.Rand(4, r * 1.25, - r/2);
+      let r3 = this.Rand(4, r, - r/2);
 
       this.elements = [
          {s: 1, f: () => this.Circle(0   , 0 , r0[0], 5, 1,0)},
          {s: 6, f: () => this.Circle(r0[1], r0[2], r0[3]/4, 5, 0, 2)},
          {s: 6, f: () => this.Rect  (-10 , 10, 100, 5, 2)},
-         {s: 6, f: () => this.Rect  (this.r * 0.8, -this.r * 0.4, 10, this.r * 0.8, 3)},
-         {s: 6, f: () => this.Circle(this.r * 0.8, 0, 10, 5, 0, 3)},
+         {s: 6, f: () => this.Rect  (r * 0.8, -r * 0.4, 10, r * 0.8, 3)},
+         {s: 6, f: () => this.Circle(r * 0.8, 0, 10, 5, 0, 3)},
       ];
 
       this.elements.push({s: 6, f: () => this.Rect (...r1, 2)});
@@ -70,10 +93,10 @@ class HexTiler {
 //      for (let y = 0; y<6; y++) {
 //         for (let x = 0; x<6; x++) {
       // account for elements possibly exceeding the boundry of a hex
-      for (let y = -1; y<=6; y++) {
-         for (let x = -1; x<=6; x++) {
-            let xOffset = y % 2 ? 0 : this.r;
-            let c = {x: x*this.dx + xOffset, y: y*this.dy + this.r};
+      for (let y = -1; y <= this.yGrid; y++) {
+         for (let x = -1; x <= this.xGrid; x++) {
+            let xOffset = y % 2 ? 0 : this.radius;
+            let c = {x: x*this.dx + xOffset, y: y*this.dy + this.radius};
             this.DrawHex(c);
          }
       }
@@ -137,6 +160,16 @@ class HexTiler {
 
    HSL(h, s, l){
       return 'hsl('+h+','+s+','+l+')';
+   }
+
+   Download() {
+      let link = document.createElement('a');
+      link.setAttribute('download', 'hex.png');
+      this.canvas.toBlob((blob) => {
+         let url = URL.createObjectURL(blob);
+         link.setAttribute('href', url);
+         link.click();
+      });
    }
 }
 
