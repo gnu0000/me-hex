@@ -1,12 +1,9 @@
 "use strict";
-
 // hex.js
-//
 // Generate image of random hexagonal tilings
 // This is also an example of saving a canvas as a png
 //
 // Craig Fitzgerald 2022
-
  
 class HexTiler {
    constructor() {
@@ -17,9 +14,10 @@ class HexTiler {
       this.dx  = this.radius * 2;
       this.dy  = this.radius * 2 * 0.86602;
 
-      $(window       ).on("resize",()=>this.Resize());
-      $("#regenerate").on("click", ()=>this.Regen());
-      $("#download"  ).on("click", ()=>this.Download());
+      $(window           ).on("resize",()=>this.Resize());
+      $("#regenerate"    ).on("click", ()=>this.Regen());
+      $("#download-image").on("click", ()=>this.DownloadImage());
+      $("#download-tile" ).on("click", ()=>this.DownloadTile());
       this.InitState();
       this.Resize();
    }
@@ -65,6 +63,7 @@ class HexTiler {
       for (let i=0; i<count; i++) {
          this.elements.push(this.CreateElement());
       }
+      //this.elements = [{sym:1, f:this.Circle, p:[0,0, this.radius, 3, "blue"]}]; //testing
    }
 
    CreateElement() {
@@ -79,7 +78,7 @@ class HexTiler {
    CreateCircle() {
       let rand = this.RI(10);
       let sym = rand==0 ? 1 : rand<5 ? 3 : 6;
-      let center = sym==1 ? [0,0] : this.Rand(2, this.radius, 0);
+      let center = sym==1 ? [0,0] : this.RList(2, this.radius, 0);
       let rad = this.R(this.radius);
       let color = this.RI(3, 1);
       rand = this.RI(13,1);
@@ -90,7 +89,7 @@ class HexTiler {
 
    CreateRect() {
       let rad  = this.radius;
-      let pos = this.Rand(4, rad * 2.5, -rad);
+      let pos = this.RList(4, rad * 2.5, -rad);
       let sym = this.RI(2)==0 ? 3 : 6;
       let rand = this.RI(19,1);
       let width = rand>10 ? 0 : rand;
@@ -101,7 +100,7 @@ class HexTiler {
 
    CreateLine() {
       let rad  = this.radius;
-      let pos = this.Rand(4, rad * 2, -rad);
+      let pos = this.RList(4, rad * 2, -rad);
       let sym = this.RI(2)==0 ? 3 : 6;
       let rand = this.RI(19,1);
       let width = rand>10 ? 0 : rand;
@@ -171,15 +170,15 @@ class HexTiler {
       this.ctx.stroke();
    }
 
-   R (max=1, offset=0) {
+   R(max=1, offset=0) {
       return offset + Math.random() * max;
    }
 
-   RI (max, offset=0) {
+   RI(max, offset=0) {
       return Math.floor(offset + Math.random() * max);
    }
 
-   Rand(count, max=1, offset=0) {
+   RList(count, max=1, offset=0) {
       let ret = [];
       for (let i=0; i<count; i++) {
          ret.push(Math.random() * max + offset);
@@ -191,10 +190,24 @@ class HexTiler {
       return 'hsl('+h+','+s+'%,'+l+'%)';
    }
 
-   Download() {
+   DownloadImage() {
+      this.Download(this.canvas, "hex-image.png");
+   }
+
+   DownloadTile() {
+      let scratch = document.createElement('canvas');
+      scratch.width  = this.dx;
+      scratch.height = this.dy * 2;
+      let ctx = scratch.getContext('2d');
+      ctx.drawImage(this.canvas, 0, 0);
+
+      this.Download(scratch, "hex-tile.png");
+   }
+
+   Download(canvas, name) {
       let link = document.createElement('a');
-      link.setAttribute('download', 'hex.png');
-      this.canvas.toBlob((blob) => {
+      link.setAttribute('download', name);
+      canvas.toBlob((blob) => {
          let url = URL.createObjectURL(blob);
          link.setAttribute('href', url);
          link.click();
