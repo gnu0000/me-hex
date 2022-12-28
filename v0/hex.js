@@ -12,13 +12,12 @@ class HexTiler {
       this.ctx     = this.canvas.getContext("2d");
       this.radius  = 100;
       this.dx  = this.radius * 2;
-      this.dy  = this.radius * 2 * Math.cos(Math.PI * 30/180);
+      this.dy  = this.radius * 2 * 0.86602;
 
       $(window           ).on("resize",()=>this.Resize());
       $("#regenerate"    ).on("click", ()=>this.Regen());
       $("#download-image").on("click", ()=>this.DownloadImage());
       $("#download-tile" ).on("click", ()=>this.DownloadTile());
-      $(".e"             ).on("click", (e)=>this.ElementToggle(e));
       this.InitState();
       this.Resize();
    }
@@ -65,25 +64,6 @@ class HexTiler {
          this.elements.push(this.CreateElement());
       }
       //this.elements = [{sym:1, f:this.Circle, p:[0,0, this.radius, 3, "blue"]}]; //testing
-
-      this.InitButtons();
-   }
-
-   InitButtons() {
-      $(".e").prop("disabled",true);
-      this.elements.forEach((e, i) => {
-         $(`.e:[data-id="${i}"]`).prop("disabled",false).addClass("chosen");
-      });
-   }
-
-   ElementToggle(e) {
-      let el = $(e.currentTarget);
-      el.toggleClass("chosen");
-      //let test1 = el.hasClass("chosen");      
-      //let test2 = el.data("id");      
-      //console.log(test1, test2);
-      this.elements[el.data("id")].c = el.hasClass("chosen");      
-      this.Draw();
    }
 
    CreateElement() {
@@ -104,7 +84,7 @@ class HexTiler {
       rand = this.RI(13,1);
       let width = rand>10 ? 0 : rand;
 
-      return {sym, c:true, f:this.Circle, p:[...center, rad, width, color]};
+      return {sym, f:this.Circle, p:[...center, rad, width, color]};
    }
 
    CreateRect() {
@@ -115,7 +95,7 @@ class HexTiler {
       let width = rand>10 ? 0 : rand;
       let color = this.RI(3, 1);
 
-      return {sym, c:true, f:this.Rect, p:[...pos, width, color]};
+      return {sym, f:this.Rect, p:[...pos, width, color]};
    }
 
    CreateLine() {
@@ -126,13 +106,12 @@ class HexTiler {
       let width = rand>10 ? 0 : rand;
       let color = this.RI(3, 1);
 
-      return {sym, c:true, f:this.Line, p:[...pos, width, color]};
+      return {sym, f:this.Line, p:[...pos, width, color]};
    }
 
    Draw() {
       this.DrawBackground();
       this.elements.forEach((e) => {
-         if (!e.c) return;
          for (let y = -1; y <= this.yGrid; y++) {
             for (let x = -1; x <= this.xGrid; x++) {
                let xOffset = y % 2 ? 0 : this.radius;

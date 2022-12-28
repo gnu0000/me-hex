@@ -17,23 +17,12 @@ body {
 
 #controls {
    position: absolute;
-   margin: 0 -17rem;
-   width: 34rem;
-   bottom: 2rem;
+   margin: -100px;
+   width: 330px;
+   bottom: 8rem;
    left: 50%;
    background: #DDD;
    padding: 0.5rem;
    text-align: center;
    border-radius: 0.35rem;
-}
-
-.e {
-   padding: 2px;
-}
-
-.e:disabled {
-}
-
-.e.chosen {
-   text-decoration-line: underline;
 }
