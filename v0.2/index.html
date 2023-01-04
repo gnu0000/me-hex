@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+      <!-- <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"> -->
+      <title>Hex Tiler</title>
+      <link href="hex.css" rel="stylesheet">
+      <script src="/js/jquery.min.js"></script>
+      <script type="module" src="hex.js"></script>
+   </head>
+   <body>
+      <canvas id="canvas"></canvas>
+      <div id="controls">
+         <button id="regenerate">Regenerate</button>
+         <button id="download-image">Download image</button>
+         <button id="download-tile" >Download tile</button>
+         <span id="s1">
+            <div id="d1">
+               <button>
+                  <svg height="12" width="12" viewBox="0 0 12 12">
+                     <circle cx="6" cy="6" r="5" stroke="black" stroke-width="1" fill="none" />
+                  </svg>
+               </button>
+               <button>
+                  <svg height="12" width="12" viewBox="0 0 12 12">
+                     <rect width="12" height="12" stroke="black" stroke-width="2" fill="none" />
+                  </svg>
+               </button>
+               <button>
+                  <svg height="12" width="12" viewBox="0 0 12 12">
+                     <line x1="0" y1="0" x2="12" y2="12" style="stroke:rgb(0,0,0);stroke-width:1" />
+                  </svg>
+               </button>
+               <button>3</button>
+               <button>4</button>
+               <button>5</button>
+               <button>6</button>
+               <button>7</button>
+               <button>8</button>
+               <button>9</button>
+            </div>
+         </span>
+      </div>
+   </body>
+</html>
