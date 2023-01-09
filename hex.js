@@ -19,6 +19,8 @@
 //    putting metadata into a png file
 //    extracting metadata from a png file
 //    module imports including import-for-effect
+//    restoring state from a url param
+//    updating url with state
 //
 // This particular file manages resizing and the UI elements on the page
 // and relies on HexTiler for the rest
@@ -57,13 +59,18 @@ class PageHandler {
       let y = $(window).height();
       this.$canvas.width (x);
       this.$canvas.height(y);
-      this.canvas.width  = x;
-      this.canvas.height = y;
+      //this.canvas.width  = x;
+      //this.canvas.height = y;
       this.hex.Resize();
    }
 
    InitState() {
-      this.hex.InitState();
+      let jsonParams = this.URLParam("params", false);
+      if (jsonParams) {
+         this.hex.SetState(JSON.parse(jsonParams));
+      } else {
+         this.hex.InitState();
+      }
       this.hex.Draw();
    }
 
@@ -86,6 +93,8 @@ class PageHandler {
       this.hex.InitState();
       this.hex.Draw();
       this.AttachButtons();
+
+      this.UpdateUrl();
    }
 
    PlaceButtons(ignoreElement = 0) {
@@ -174,6 +183,20 @@ class PageHandler {
          "";
       svg.append(node);
       button.empty().append(svg);
+   }
+
+   URLParam(name, defaultVal) {
+      var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+      if(results){
+         return decodeURIComponent(results[1]);
+      }
+      return defaultVal;
+   }
+
+   UpdateUrl() {
+      let url = new URL(document.location);
+      url.searchParams.set("params", JSON.stringify(this.hex.GetState()));
+      history.replaceState(null, "", url);
    }
 }
 

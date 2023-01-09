@@ -9,21 +9,23 @@
 
 import PngMeta from './pngMetadata.js'
 
-
+// constructor params:
+//    canvas  - either a css selector or a jquery obj for a canvas
+//    options - todo
+//
 export default class HexTiler {
-   constructor(canvasSelector, options) {
-      this.$canvas = $(canvasSelector);
-      this.canvas  = this.$canvas.get(0);
-      this.ctx     = this.canvas.getContext("2d");
+   constructor(canvas, options) {
+      this.version  = "1.0.0";
+      this.$canvas  = canvas instanceof jQuery ? canvas : $(canvas);
+      this.canvas   = this.$canvas.get(0);
+      this.ctx      = this.canvas.getContext("2d");
       this.elements = [];
+      this.scale    = 1.0;
       this.buttonSpacing = 20;
       this.stateChangeEvent = new Event("stateChange");
 
       this.$canvas.on("dragover" , (e)=>this.DragOverHandler(e));
       this.$canvas.on("drop"     , (e)=>this.DropHandler(e));
-
-      this.InitState();
-      this.Resize();
    }
 
    InitState() {
@@ -66,12 +68,31 @@ export default class HexTiler {
       document.dispatchEvent(this.stateChangeEvent);
    }
 
+   SetScale(scale) {
+      this.scale = scale;
+   }
+
+   GetScale(scale) {
+      return this.scale;
+   }
 
    Resize() {
-      let x = this.canvas.width ;
-      let y = this.canvas.height;
-      this.xGrid = Math.floor(x / this.dx) + 1;
-      this.yGrid = Math.floor(y / this.dy) + 1;
+      this.canvas.width  = this.$canvas.width()  / this.scale;
+      this.canvas.height = this.$canvas.height() / this.scale;
+      this.xGrid = Math.floor(this.canvas.width  / this.dx) + 1;
+      this.yGrid = Math.floor(this.canvas.height / this.dy) + 1;
+      return this;
+   }
+
+   GetState() {
+      let elements = this.elements.slice(0);
+      elements.forEach(e => delete e.button);
+
+      return {
+         elements,
+         styles: this.styles,
+         radius: this.radius
+      };
    }
 
    CreateElement() {
@@ -222,18 +243,11 @@ export default class HexTiler {
       let link = document.createElement('a');
       link.setAttribute('download', name);
       canvas.toBlob(async (blob) => {
-         let elements = this.elements.slice(0);
-         elements.forEach(e => delete e.button);
-
-         let params = {
-            elements,
-            styles: this.styles,
-            radius: this.radius
-         };
          let metadata = {
             "tEXt": {
-               "Title": "a hex tile",
-               "Params": JSON.stringify(params)
+               "Title": "A hex tile",
+               "Software": `HexTile v${this.version}`,
+               "Params": JSON.stringify(this.GetState())
             }
          };
          var newBlob = await PngMeta.writeMetadataB(blob,metadata);
@@ -258,6 +272,7 @@ export default class HexTiler {
          let metadata = PngMeta.readMetadata(buffer);
 
          if (!metadata.tEXt || !metadata.tEXt.Params) return;
+         console.log("png metadata:", metadata);
          let params = JSON.parse(metadata.tEXt.Params);
          this.SetState(params);
          this.Draw();
