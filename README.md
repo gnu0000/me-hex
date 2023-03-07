@@ -21,12 +21,16 @@ This demonstrates:
 -   restoring state from a url param
 -   updating url with state
 
-
-
 https://craig-fitzgerald.com/toys/hex/
+<br/>
+<br/>
 
+## Generate several patterns to choose from
 
+https://craig-fitzgerald.com/toys/hex/patterns.html
 
+## 3d cubes tiled with random patterns (uses 3d.js)
 
+https://craig-fitzgerald.com/toys/hex/3d/
 
 

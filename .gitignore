@@ -2,6 +2,9 @@ node_modules/
 build/
 dist/
 bkup/
+v0/
+v0.1/
+v0.2/
 *.pem
 *.cer
 *.p12
