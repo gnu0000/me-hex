@@ -30,7 +30,7 @@ export default class HexTiler {
 
    InitState() {
       // hex size
-      this.radius = this.R(150, 30);
+      this.radius = this.R(150 * this.scale, 30 * this.scale);
       this.dx  = this.radius * 2;
       this.dy  = this.radius * 2 * 0.86602;
       this.xGrid = Math.floor(this.canvas.width  / this.dx) + 1;
@@ -54,6 +54,7 @@ export default class HexTiler {
          element.chosen = i < count;
          this.elements.push(element);
       }
+      console.log("Elements: ", this.elements);
       document.dispatchEvent(this.stateChangeEvent);
    }
 
@@ -69,7 +70,16 @@ export default class HexTiler {
    }
 
    SetScale(scale) {
-      this.scale = scale;
+      console.log(`Scale: ${this.scale} bump by ${scale}`);
+
+      this.radius *= scale;
+      this.dx *= scale;
+      this.dy *= scale;
+      this.Resize();
+      this.ScaleElements(scale);
+      this.Draw();
+
+      this.scale *= scale;
    }
 
    GetScale(scale) {
@@ -77,8 +87,8 @@ export default class HexTiler {
    }
 
    Resize() {
-      this.canvas.width  = this.$canvas.width()  / this.scale;
-      this.canvas.height = this.$canvas.height() / this.scale;
+      this.canvas.width  = this.$canvas.width();
+      this.canvas.height = this.$canvas.height();
       this.xGrid = Math.floor(this.canvas.width  / this.dx) + 1;
       this.yGrid = Math.floor(this.canvas.height / this.dy) + 1;
       return this;
@@ -136,6 +146,10 @@ export default class HexTiler {
       let color = this.RI(3, 1);
 
       return {t:"l", sym, color, p:[...pos, width]};
+   }
+   
+   ScaleElements(s) {
+      this.elements.map((e) => {e.p.map((p,i) => e.p[i] *= s)});
    }
 
    Draw() {

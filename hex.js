@@ -36,8 +36,11 @@ class PageHandler {
       this.$canvas = $("#canvas");
       this.canvas  = this.$canvas.get(0);
       this.buttonSpacing = 20;
+      this.scale = 1.0;
 
       $(window           ).on("resize"     , ()=>this.ResizeHandler());
+      $(window           ).keydown((e)=>this.KeyDownHandler(e));
+
       $("#regenerate"    ).on("click"      , ()=>this.RegenHandler());
       $("#download-image").on("click"      , ()=>this.DownloadImageHandler());
       $("#download-tile" ).on("click"      , ()=>this.DownloadTileHandler());
@@ -170,6 +173,21 @@ class PageHandler {
 
    DownloadTileHandler() {
       this.hex.DownloadTile();
+   }
+
+   Scale(newScale) {
+      this.hex.SetScale(newScale);
+      this.hex.Resize();
+      this.scale = newScale;
+      this.hex.Draw();
+   }
+
+   KeyDownHandler(event) {
+      let e = event.originalEvent;
+      switch(e.which){
+         case 107:return this.Scale(1.25); // +
+         case 109:return this.Scale(0.75); // -
+      }
    }
 
    StyleButton(button, element) {
